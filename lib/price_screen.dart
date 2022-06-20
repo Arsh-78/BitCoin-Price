@@ -13,7 +13,9 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   CoinData coinData = CoinData();
   String selectedCurrency = 'USD';
-  String priceCur = '? USD';
+  String priceCurBTC = '? USD';
+  String priceCurETH = '? USD';
+  String priceCURLTC = '? USD';
   String coinName = "BTC";
 
   DropdownButton<String> androidPicker() {
@@ -33,8 +35,12 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value) {
         setState(() async {
           selectedCurrency = value;
-          var coindata = await coinData.getCoinPrice(selectedCurrency);
-          updateUI(coindata);
+          List<dynamic> allCoinData = [];
+          for (String coin in cryptoList) {
+            var coindata = await coinData.getCoinPrice(selectedCurrency, coin);
+            allCoinData.add(coindata);
+          }
+          updateUI(allCoinData);
         });
       },
     );
@@ -50,8 +56,13 @@ class _PriceScreenState extends State<PriceScreen> {
       onSelectedItemChanged: (selectedIndex) async {
         setState(() async {
           selectedCurrency = currenciesList[selectedIndex];
-          var coindata = await coinData.getCoinPrice(selectedCurrency);
-          updateUI(coindata);
+          List<dynamic> allCoinData = [];
+          for (String coin in cryptoList) {
+            var coindata = await coinData.getCoinPrice(selectedCurrency, coin);
+            allCoinData.add(coindata);
+          }
+
+          updateUI(allCoinData);
         });
       },
       backgroundColor: Colors.lightBlue,
@@ -68,13 +79,15 @@ class _PriceScreenState extends State<PriceScreen> {
     }
   } replaced with ternanry operator*/
 
-  void updateUI(dynamic coinData) {
+  void updateUI(List<dynamic> coinData) {
     setState(() {
       if (coinData == null) {
         print('Some Error');
       }
-      double rate = coinData['rate'];
-      priceCur = rate.toStringAsFixed(2);
+
+      priceCurBTC = coinData[0]['rate'].toStringAsFixed(2);
+      priceCurETH = coinData[1]['rate'].toStringAsFixed(2);
+      priceCURLTC = coinData[2]['rate'].toStringAsFixed(2);
     });
   }
 
@@ -85,8 +98,13 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   void getData() async {
-    var coindata = await coinData.getCoinPrice('USD');
-    updateUI(coindata);
+    List<dynamic> allCoinUSDdata = [];
+    for (String coin in cryptoList) {
+      var coindata = await coinData.getCoinPrice('USD', coin);
+      allCoinUSDdata.add(coindata);
+    }
+
+    updateUI(allCoinUSDdata);
   }
 
   @override
@@ -110,7 +128,49 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 $coinName = $priceCur $selectedCurrency',
+                  '1 BTC = $priceCurBTC $selectedCurrency',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+            child: Card(
+              color: Colors.lightBlueAccent,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  '1 ETH = $priceCurETH $selectedCurrency',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+            child: Card(
+              color: Colors.lightBlueAccent,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  '1 LTC = $priceCURLTC $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
