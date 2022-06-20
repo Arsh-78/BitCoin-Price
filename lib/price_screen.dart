@@ -31,8 +31,10 @@ class _PriceScreenState extends State<PriceScreen> {
       value: selectedCurrency,
       items: dropdownMenuItems,
       onChanged: (value) {
-        setState(() {
+        setState(() async {
           selectedCurrency = value;
+          var coindata = await coinData.getCoinPrice(selectedCurrency);
+          updateUI(coindata);
         });
       },
     );
@@ -45,8 +47,12 @@ class _PriceScreenState extends State<PriceScreen> {
     }
 
     return CupertinoPicker(
-      onSelectedItemChanged: (selectedIndex) {
-        print(selectedIndex);
+      onSelectedItemChanged: (selectedIndex) async {
+        setState(() async {
+          selectedCurrency = currenciesList[selectedIndex];
+          var coindata = await coinData.getCoinPrice(selectedCurrency);
+          updateUI(coindata);
+        });
       },
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
@@ -79,7 +85,7 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   void getData() async {
-    var coindata = await coinData.getCoinPrice();
+    var coindata = await coinData.getCoinPrice('USD');
     updateUI(coindata);
   }
 
